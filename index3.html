@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Simulador de entrada y salida de efectivo</title>
+  </head>
+  <body>
+    <h1>Simulador de entrada y salida de efectivo</h1>
+    <label for="cuenta">Selecciona una cuenta:</label>
+    <select id="cuenta">
+      <option value="Mali">Mali</option>
+      <option value="Gera">Gera</option>
+      <option value="Maui">Maui</option>
+    </select>
+    <label for="password">Introduce el password:</label>
+    <input type="password" id="password">
+    <button onclick="iniciarSesion()">Iniciar sesión</button>
+    <br><br>
+    <div id="opciones" style="display: none;">
+      <button onclick="consultarSaldo()">Consultar saldo</button>
+      <button onclick="ingresarMonto()">Ingresar monto</button>
+      <button onclick="retirarMonto()">Retirar monto</button>
+      <br><br>
+      <label for="monto">Introduce el monto:</label>
+      <input type="number" id="monto">
+      <button onclick="confirmarMonto()" id="confirmar" style="display: none;">Confirmar</button>
+      <br><br>
+      <div id="mensaje"></div>
+    </div>
+    <script>
+      var cuentas = [
+        { nombre: "Mali", saldo: 200 },
+        { nombre: "Gera", saldo: 290 },
+        { nombre: "Maui", saldo: 67 }
+      ];
+      var cuentaSeleccionada = "";
+      var saldoActual = 0;
+      var saldoOriginal = 0;
+      var passwordCorrecto = false;
+      function iniciarSesion() {
+        var cuenta = document.getElementById("cuenta").value;
+        var password = document.getElementById("password").value;
+        for (var i = 0; i < cuentas.length; i++) {
+          if (cuentas[i].nombre === cuenta && password === "password") {
+            cuentaSeleccionada = cuenta;
+            saldoActual = cuentas[i].saldo;
+            saldoOriginal = cuentas[i].saldo;
+            passwordCorrecto = true;
+            document.getElementById("opciones").style.display = "block";
+            actualizarMensaje("");
+            actualizarSaldo();
+            break;
+          }
+        }
+        if (!passwordCorrecto) {
+          actualizarMensaje("Password incorrecto. Intenta de nuevo.");
+        }
+      }
+      function actualizarSaldo() {
+        document.getElementById("mensaje").innerHTML = "";
+        document.getElementById("monto").value = "";
+        document.getElementById("saldo").innerHTML = saldoActual.toFixed(2);
+      }
+      function consultarSaldo() {
+        actualizarSaldo();
+      }
+      function ingresarMonto() {
+        actualizarMensaje("");
+        document.getElementById("monto").value = "";
+        document.getElementById("confirmar").style.display = "inline";
+        document.getElementById("confirmar").onclick = function() {
+          var monto = parseFloat(document.getElementById("monto").value);
+          if (isNaN(monto) || monto <= 0) {
+            actualizarMensaje("Por favor introduce un monto válido.");
+          } else {
+            saldoActual += monto;
+            if (saldoActual > 990) {
+              saldoActual = 990;
+              actualizarMensaje("No se puede ingresar más de $990.");
+            } else {
+          actualizarSaldo();
+        }
+      }
+    };
+  }
+  function retirarMonto() {
+    actualizarMensaje("");
+    document.getElementById("monto").value = "";
+    document.getElementById("confirmar").style.display = "inline";
+    document.getElementById("confirmar").onclick = function() {
+      var monto = parseFloat(document.getElementById("monto").value);
+      if (isNaN(monto) || monto <= 0) {
+        actualizarMensaje("Por favor introduce un monto válido.");
+      } else if (monto > saldoActual) {
+        actualizarMensaje("No se puede retirar más de lo que hay en la cuenta.");
+      } else {
+        saldoActual -= monto;
+        if (saldoActual < 10) {
+          saldoActual = 10;
+          actualizarMensaje("No se puede retirar más de lo que hay en la cuenta.");
+        } else {
+          actualizarSaldo();
+        }
+      }
+    };
+  }
+  function confirmarMonto() {
+    document.getElementById("confirmar").style.display = "none";
+  }
+  function actualizarMensaje(mensaje) {
+    document.getElementById("mensaje").innerHTML = mensaje;
+  }
+</script>
+  </body>
+</html>
